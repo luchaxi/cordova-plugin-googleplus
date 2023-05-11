@@ -50,13 +50,22 @@
     }
 
     NSString *clientId = [self reverseUrlScheme:reversedClientId];
+    
+    NSString* scopesString = options[@"scopes"];
     NSString* serverClientId = options[@"webClientId"];
     NSString* hostedDomain = options[@"hostedDomain"];
+    BOOL offline = [options[@"offline"] boolValue];
 
     GIDConfiguration *config = [[GIDConfiguration alloc] initWithClientID:clientId serverClientID:serverClientId hostedDomain:hostedDomain openIDRealm:nil];
 
     GIDSignIn *signIn = [GIDSignIn sharedInstance];
-
+    
+    // default scopes are email and profile
+    if (scopesString != nil) {
+        NSArray* scopes = [scopesString componentsSeparatedByString:@" "];
+        [signIn setScopes:scopes];
+    }
+    
     [signIn signInWithConfiguration:config presentingViewController:self.viewController callback:^(GIDGoogleUser * _Nullable user, NSError * _Nullable error) {
         [self handleSignInCompleteWithUser:user error:error];
     }];
